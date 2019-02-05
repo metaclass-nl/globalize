@@ -1,6 +1,6 @@
 var webpack = require( "webpack" );
 var path = require("path");
-var CommonsChunkPlugin = require( "webpack/lib/optimize/CommonsChunkPlugin" );
+//var CommonsChunkPlugin = require( "webpack/lib/optimize/CommonsChunkPlugin" );
 var HtmlWebpackPlugin = require( "html-webpack-plugin" );
 var GlobalizePlugin = require( "globalize-webpack-plugin" );
 
@@ -46,18 +46,31 @@ module.exports = {
 			output: "i18n/[locale].[chunkhash].js"
 		})
 	].concat( production ? [
-		new CommonsChunkPlugin({
-			name: "vendor",
-			minChunks: function(module) {
-				return (
-					module.context && module.context.indexOf("node_modules") !== -1
-				);
-			}
-		}),
-		new webpack.optimize.UglifyJsPlugin({
-			compress: {
-				warnings: false
-			}
-		})
-	] : [] )
+		// in webpack 4 replaced by SplitChunksPlugin
+		// new CommonsChunkPlugin({
+		// 	name: "vendor",
+		// 	minChunks: function(module) {
+		// 		return (
+		// 			module.context && module.context.indexOf("node_modules") !== -1
+		// 		);
+		// 	}
+		// }),
+        // removed from webpack 4
+		// new webpack.optimize.UglifyJsPlugin({
+		// 	compress: {
+		// 		warnings: false
+		// 	}
+		// })
+	] : [] ),
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                commons: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "vendor",
+                    chunks: "all"
+                }
+            }
+        }
+    }
 };
